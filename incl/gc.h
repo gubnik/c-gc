@@ -4,33 +4,103 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define MAX_REF_COUNT 1e+6
-
 typedef struct gc gc;
 typedef struct gc_obj gc_obj;
 
+/*
+ * Garbage collector object
+ *
+ * Structure that containst necessary information to manage
+ * the object via garbage collector.
+ * Acts as a linked list.
+ *
+ * next    - next object
+ * memarea - allocated memory
+ * marked  - is object marked for deletion
+ *
+*/
 typedef struct gc_obj
 {
   gc_obj *  next;
-  size_t refcount;
   void * memarea;
   bool marked;
 }
 gc_obj;
 
+/*
+ * Garbage collector 
+ *
+ * Wrapper struct that implements a garbage collector 
+ *
+ * root - root of a linked list consisting of garbage collector objects
+ *
+*/
 typedef struct gc 
 {
   gc_obj * root;
 }
 gc;
 
-gc_obj * cgc_gcobj_new (size_t);
+/*
+ * Allocates a new gc_obj on the heap and initializes its fields.
+ *
+ * Params:
+ * allocsize - amount of memory to allocate
+ *
+ * Return:
+ * Allocated an object
+*/
+gc_obj * cgc_gcobj_new (size_t allocsize);
 
+/*
+ * Initializes garbage collector 
+ *
+ * Returns:
+ * garbage collector pointer
+*/
 gc * cgc_gc_init ();
+
+/*
+ * Allocates memory via garbage collector.
+ * When this function is called, allocated memory is known to GC.
+ *
+ * Params:
+ * garcol - garbage collector 
+ * allocsize - amount of memory to allocate 
+*/
 void * cgc_gc_allocate (gc * garcol, size_t allocsize);
+
+/* TODO - implement a better marking mechanism
+ *
+ * Marks objects for deletion.
+ *
+ * Params:
+ * garcol - garbage collector
+*/
 void cgc_gc_mark (gc * garcol);
+
+/*
+ * Destroys marked objects 
+ *
+ * Params:
+ * garcol - garbage collector
+*/
 void cgc_gc_sweep (gc * garcol);
+
+/*
+ * Invokes mark & sweep
+ *
+ * Params:
+ * garcol - garbage collector
+*/
 void cgc_gc_collect (gc * garcol);
+
+/*
+ * Destroys the garbage collector
+ *
+ * Params:
+ * garcol - garbage collector
+*/
 void cgc_gc_destroy (gc * garcol);
 
 #endif // !C_GC
