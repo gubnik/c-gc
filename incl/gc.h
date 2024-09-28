@@ -7,6 +7,8 @@
 typedef struct gc gc;
 typedef struct gc_obj gc_obj;
 
+typedef void* (*allocator_t)(size_t);
+
 /*
  * Garbage collector object
  *
@@ -68,7 +70,7 @@ gc * cgc_gc_init ();
  * garcol - garbage collector 
  * allocsize - amount of memory to allocate 
 */
-void * cgc_gc_allocate (gc * garcol, size_t allocsize);
+void * cgc_gc_allocate (gc * garcol, size_t allocsize, allocator_t allocator);
 
 /* TODO - implement a better marking mechanism
  *

@@ -1,7 +1,10 @@
 #include <stdio.h>
 
+#define CGC_USE_INIT
+
 #include "incl/entry_point.h"
 
+CGC_MAKE_DEFAULT_INIT_FUNC(int);
 
 int main (int argc, char ** argv)
 {

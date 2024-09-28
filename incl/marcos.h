@@ -17,6 +17,7 @@
 #define C_GC_ENTRY_POINT
 
 #include "gc.h"
+#include <stdlib.h>
 
 int CGCUserMain(int argc, char ** argv, gc * gc);
 
@@ -34,7 +35,22 @@ int CGCUserMain(int argc, char ** argv, gc * gc);
   int CGCUserMain(int argc, char ** argv, gc * garcol)
 #endif
 
-#define allocate(Type) (Type *) cgc_gc_allocate(garcol, sizeof(Type))
-#define allocate_area(Type, N) (Type *) cgc_gc_allocate(garcol, sizeof(Type) * (size_t) N)
+/*
+ * Option to use a user-defined allocation method instead of malloc.
+ * By default, malloc will be used in cgc_gc_type_allocate, with no fields 
+ * initialization.
+ */
+#ifdef CGC_USE_INIT
+  #define objalloc(Type) (allocator_t)cgc_init_##Type
+#else
+  #define objalloc(Type) (allocator_t)malloc
+#endif
+
+#define CGC_MAKE_DEFAULT_INIT_FUNC(Type) \
+void * cgc_init_##Type (size_t N) \
+{ return malloc(N); }
+
+#define allocate(Type) (Type *) cgc_gc_allocate(garcol, sizeof(Type), objalloc(Type))
+#define allocate_area(Type, N) (Type *) cgc_gc_allocate(garcol, sizeof(Type) * (size_t) N, objalloc(Type))
 
 #endif // !C_GC_ENTRY_POINT

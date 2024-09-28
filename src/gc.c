@@ -24,14 +24,14 @@ gc_obj * cgc_gcobj_new (size_t amount)
     exit(255);
   }
   nobj->next = NULL;
-  nobj->memarea = malloc(amount);
   nobj->marked = false;
   return nobj;
 }
 
-void * cgc_gc_allocate(gc * garcol, size_t amount)
+void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
 {
   gc_obj * newobj = cgc_gcobj_new(amount);
+  newobj->memarea = (*allocator)(amount); //malloc(amount);
   gc_obj * iter = garcol->root;
   if (!iter)
   {
