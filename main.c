@@ -1,8 +1,9 @@
 #include <stdio.h>
 
 #define CGC_USE_INIT
+#define CGC_ENTRY_POINT
 
-#include "incl/entry_point.h"
+#include "incl/marcos.h"
 
 CGC_MAKE_DEFAULT_INIT_FUNC(int);
 
