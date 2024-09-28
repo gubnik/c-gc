@@ -25,7 +25,6 @@ gc_obj * cgc_gcobj_new (size_t amount)
   }
   nobj->next = NULL;
   nobj->memarea = malloc(amount);
-  nobj->refcount = 1;
   nobj->marked = false;
   return nobj;
 }
