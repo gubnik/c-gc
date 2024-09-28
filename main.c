@@ -1,5 +1,4 @@
 #include <stdio.h>
-#define CGC_MACROS
 
 #include "incl/entry_point.h"
 
