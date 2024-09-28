@@ -44,7 +44,7 @@ typedef struct big_stuff
     size_t num2;
     size_t num3;
     size_t num4;
-} BS;
+} big_stuff;
 
 // Initializes big_stuff struct with random values
 void * cgc_init_big_stuff (size_t N)
