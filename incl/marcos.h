@@ -25,7 +25,7 @@ int CGCUserMain(int argc, char ** argv, gc * gc);
 #define main(...) \
   main (int argc, char ** argv) \
   { \
-    gc * garcol = cgc_gc_init(); \
+    gc * garcol = cgc_init_gc(); \
     int res = \
       CGCUserMain(argc, argv, garcol); \
     cgc_gc_collect (garcol); \

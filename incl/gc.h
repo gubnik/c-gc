@@ -60,7 +60,7 @@ gc_obj * cgc_gcobj_new (size_t allocsize);
  * Returns:
  * garbage collector pointer
 */
-gc * cgc_gc_init ();
+gc * cgc_init_gc ();
 
 /*
  * Allocates memory via garbage collector.

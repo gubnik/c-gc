@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-gc * cgc_gc_init()
+gc * cgc_init_gc ()
 {
   gc * garcol = (gc *) malloc(sizeof(gc));
   if (!garcol)
