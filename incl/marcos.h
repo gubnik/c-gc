@@ -21,7 +21,7 @@
 
 int CGCUserMain(int argc, char ** argv, gc * gc);
 
-#ifndef NO_GC_ENTRY_POINT
+#ifdef CGC_ENTRY_POINT
 #define main(...) \
   main (int argc, char ** argv) \
   { \
