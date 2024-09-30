@@ -1,6 +1,18 @@
 # C-GC
 
-A basic garbage collector implementation in C 
+A basic garbage collector implementation in C. It supports multithreading.
+
+## Production usage
+This garbage collector is not entirely suited for production usage (yet), because:
+1. Marking algorithm is as primitive as possible and marks _every_ object independant of 
+its reference count, usage etc.
+2. Advanced features rely heavily on macros that in turn rely on user-defined functions,
+which introduces a level of boilerplate and abstraction, especially during compilation.
+Using modern LSPs somewhat mitigates potential drawbacks of this but it still may be 
+undesirable for a large codebase.
+3. Multithreading has potential for deadlocks in marking and sweeping functions, which I was 
+not able to confirm nor deny. Use with caution.
+
 
 ## Example
 ```c 

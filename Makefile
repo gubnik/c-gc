@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-O2 -Wall -fsanitize=address -pthread
-CLIBFLAGS=-O2 -Wall -pthread -fsanitize=address
-LDFLAGS=gc.o -pthread
+CFLAGS=-O2 -Wall -fsanitize=address
+CLIBFLAGS=-O2 -Wall -fsanitize=address
+LDFLAGS=gc.o
 LDLIBFLAGS=-pthread
 
 .PHONY: main %.o
