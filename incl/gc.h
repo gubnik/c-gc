@@ -1,5 +1,17 @@
-#ifndef C_GC
-#define C_GC
+/*
+ * Garbage Collector 
+ *
+ * Implements a basic mark-and-sweep garbage collector
+ * Includes a support for multithreading
+ * 
+ * TODO: Marking algorithm is currently WIP and marks everything for removal.
+ * TODO: Implement a reference counting algorithm AND/OR stack approach
+ *
+ * For macros, see marcos.h
+ */
+
+#ifndef CGC_GC_H
+#define CGC_GC_H
 
 #include <pthread.h>
 #include <stdbool.h>
@@ -17,9 +29,9 @@ typedef void* (*allocator_t)(size_t);
  * the object via garbage collector.
  * Acts as a linked list.
  *
- * next    - next object
- * memarea - allocated memory
- * marked  - is object marked for deletion
+ * @next    - next object
+ * @memarea - allocated memory
+ * @marked  - is object marked for deletion
  *
 */
 typedef struct gc_obj
@@ -108,4 +120,4 @@ void cgc_gc_collect (gc * garcol);
 */
 void cgc_gc_destroy (gc * garcol);
 
-#endif // !C_GC
+#endif // !CGC_GC_H

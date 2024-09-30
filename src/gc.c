@@ -5,6 +5,11 @@
 #include <stdlib.h>
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - failed allocation results in an error 
+ * - initializes mutex 
+ */
 gc * cgc_init_gc ()
 {
   gc * garcol = (gc *) malloc(sizeof(gc));
@@ -19,6 +24,12 @@ gc * cgc_init_gc ()
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - failed allocation results in a NULL return 
+ * - initializes mutex 
+ * - initalizes pointer fields to NULL 
+ */
 gc_obj * cgc_gcobj_new (size_t amount)
 {
   gc_obj * nobj = malloc(sizeof(gc_obj));
@@ -34,6 +45,11 @@ gc_obj * cgc_gcobj_new (size_t amount)
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - failed gc_obj allocation returns NULL 
+ * - failed object allocation via allocator returns NULL 
+ */
 void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
 {
   pthread_mutex_lock(&garcol->mutex);
@@ -64,6 +80,11 @@ void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - marks every object 
+ * TODO: implement either reference counting algorith AND/OR stack based algorith
+ */
 void cgc_gc_mark(gc * garcol)
 {
   pthread_mutex_lock(&garcol->mutex);
@@ -77,6 +98,11 @@ void cgc_gc_mark(gc * garcol)
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - frees every marked object 
+ * - destroys every marked object's mutex
+ */
 void cgc_gc_sweep(gc * garcol)
 {
   pthread_mutex_lock(&garcol->mutex);
@@ -94,6 +120,7 @@ void cgc_gc_sweep(gc * garcol)
     else 
     {
       *ref = obj->next;
+      pthread_mutex_destroy(&obj->mutex);
       free(obj->memarea);
       free(obj);
     }
@@ -102,6 +129,11 @@ void cgc_gc_sweep(gc * garcol)
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - invokes mark and sweep functions, mutex locking and unlocking is done within
+ *   those functions.
+ */
 void cgc_gc_collect(gc * garcol)
 {
   cgc_gc_mark(garcol);
@@ -109,6 +141,12 @@ void cgc_gc_collect(gc * garcol)
 }
 
 /* See gc.h */
+/*
+ * Implementation details:
+ * - frees every associated object
+ * - destroys mutex 
+ * - destroys every associated object's mutex 
+ */ 
 void cgc_gc_destroy(gc *garcol)
 {
   if (!garcol) return;
@@ -118,6 +156,7 @@ void cgc_gc_destroy(gc *garcol)
   {
     gc_obj * temp = iter->next;
     pthread_mutex_destroy(&iter->mutex);
+    free(iter->memarea);
     free(iter);
     iter = temp;
   }

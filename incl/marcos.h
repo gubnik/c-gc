@@ -10,17 +10,23 @@
  * Macros:
  * allocate(Type) - allocates exactly one object of type on the heap through garbage collector 
  * allocate_area(Type, N) - allocates N objects of type on the heap through garbage collector
-*/
+ */
 
-
-#ifndef C_GC_ENTRY_POINT
-#define C_GC_ENTRY_POINT
+#ifndef CGC_MACROS_H
+#define CGC_MACROS_H
 
 #include "gc.h"
 #include <stdlib.h>
 
 int CGCUserMain(int argc, char ** argv, gc * gc);
 
+/*
+ * Custom entry point macros 
+ * Replaces main(...) entry point with a predefined one with initialization and
+ * destruction of a garbage collector.
+ * User-defined code will be placed into CGCUserMain(), with provided pointer to 
+ * the initalized garbage collector by $garcol.
+ */
 #ifdef CGC_ENTRY_POINT
 #define main(...) \
   main (int argc, char ** argv) \
@@ -37,8 +43,7 @@ int CGCUserMain(int argc, char ** argv, gc * gc);
 
 /*
  * Option to use a user-defined allocation method instead of malloc.
- * By default, malloc will be used in cgc_gc_type_allocate, with no fields 
- * initialization.
+ * By default, malloc will be used in allocate macros, with no fields initialization.
  */
 #ifdef CGC_USE_INIT
   #define objalloc(Type) (allocator_t)cgc_init_##Type
@@ -46,11 +51,24 @@ int CGCUserMain(int argc, char ** argv, gc * gc);
   #define objalloc(Type) (allocator_t)malloc
 #endif
 
+/*
+ * Macros for defining a default malloc() init function for a type.
+ * Use with CGC_USE_INIT for types that don't require elaborate initialization.
+ */
 #define CGC_MAKE_DEFAULT_INIT_FUNC(Type) \
 void * cgc_init_##Type (size_t N) \
 { return malloc(N); }
 
+/*
+ * Macros for easy type allocation via a garbage collector.
+ * With custom entry point, it is not required to pass garbage collector pointer.
+ */
+#ifdef CGC_ENTRY_POINT
 #define allocate(Type) (Type *) cgc_gc_allocate(garcol, sizeof(Type), objalloc(Type))
 #define allocate_area(Type, N) (Type *) cgc_gc_allocate(garcol, sizeof(Type) * (size_t) N, objalloc(Type))
+#else 
+#define allocate(gc, Type) (Type *) cgc_gc_allocate(gc, sizeof(Type), objalloc(Type))
+#define allocate_area(gc, Type, N) (Type *) cgc_gc_allocate(gc, sizeof(Type) * (size_t) N, objalloc(Type))
+#endif
 
-#endif // !C_GC_ENTRY_POINT
+#endif // !CGC_MACROS_H
