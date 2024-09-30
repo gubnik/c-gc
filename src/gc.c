@@ -1,6 +1,5 @@
 #include "../incl/gc.h"
 
-#include <bits/pthreadtypes.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +38,15 @@ void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
 {
   pthread_mutex_lock(&garcol->mutex);
   gc_obj * newobj = cgc_gcobj_new(amount);
+  if (!newobj)
+  {
+    return NULL;
+  }
   newobj->memarea = (*allocator)(amount); //malloc(amount);
+  if (!newobj->memarea)
+  {
+    return NULL;
+  }
   gc_obj * iter = garcol->root;
   if (!iter)
   {
