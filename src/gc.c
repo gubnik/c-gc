@@ -56,11 +56,15 @@ void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
   gc_obj * newobj = cgc_gcobj_new(amount);
   if (!newobj)
   {
+    pthread_mutex_unlock(&garcol->mutex);
     return NULL;
   }
   newobj->memarea = (*allocator)(amount); //malloc(amount);
   if (!newobj->memarea)
   {
+    pthread_mutex_destroy(&newobj->mutex);
+    pthread_mutex_unlock(&garcol->mutex);
+    free(newobj);
     return NULL;
   }
   gc_obj * iter = garcol->root;
@@ -87,14 +91,12 @@ void * cgc_gc_allocate(gc * garcol, size_t amount, allocator_t allocator)
  */
 void cgc_gc_mark(gc * garcol)
 {
-  pthread_mutex_lock(&garcol->mutex);
   for (gc_obj * ptr = garcol->root; ptr; ptr = ptr->next)
   {
     pthread_mutex_lock(&ptr->mutex);
     ptr->marked = true;
     pthread_mutex_unlock(&ptr->mutex);
   }
-  pthread_mutex_unlock(&garcol->mutex);
 }
 
 /* See gc.h */
@@ -150,11 +152,13 @@ void cgc_gc_collect(gc * garcol)
 void cgc_gc_destroy(gc *garcol)
 {
   if (!garcol) return;
+  pthread_mutex_unlock(&garcol->mutex);
   pthread_mutex_destroy(&garcol->mutex);
   gc_obj * iter = garcol->root;
   while (iter)
   {
     gc_obj * temp = iter->next;
+    pthread_mutex_unlock(&iter->mutex);
     pthread_mutex_destroy(&iter->mutex);
     free(iter->memarea);
     free(iter);

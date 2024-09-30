@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O2 -Wall -fsanitize=address -pthread
-CLIBFLAGS=-O2 -Wall -pthread
+CLIBFLAGS=-O2 -Wall -pthread -fsanitize=address
 LDFLAGS=gc.o -pthread
 LDLIBFLAGS=-pthread
 

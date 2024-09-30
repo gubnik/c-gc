@@ -1,3 +1,5 @@
+#include "incl/gc.h"
+#include <pthread.h>
 #include <stdio.h>
 
 #define CGC_USE_INIT
@@ -5,15 +7,40 @@
 
 #include "incl/marcos.h"
 
-CGC_MAKE_DEFAULT_INIT_FUNC(int);
+void * cgc_init_int (size_t N)
+{
+  int * I = malloc(N);
+  *I = 42;
+  return I;
+}
+
+#define TALLOCS 5
+
+void * threadfunc (void * garcol)
+{
+  for (int i = 0; i < TALLOCS; i++)
+  {
+    cgc_gc_allocate(garcol, sizeof(int), cgc_init_int);
+  }
+  return NULL;
+}
 
 int main (int argc, char ** argv)
 {
-  int * intarray = allocate_area(int, 10);
-  for (int i = 0; i < 10; i++)
+  pthread_t threads [8];
+  for (int i = 0; i < 8; i++)
   {
-    intarray[i] = 10;
-    printf("%d\n", i);
+    pthread_create(&threads[i], NULL, threadfunc, garcol);
   }
-  return 9;
+  for (int i = 0; i < 8; i++)
+  {
+    pthread_join(threads[i], NULL);
+  }
+  gc_obj * iter = garcol->root;
+  while (iter)
+  {
+    printf("%p :: %d\n", iter, *(int*)iter->memarea);
+    iter = iter->next;
+  }
+  return 0;
 }
