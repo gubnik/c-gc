@@ -78,6 +78,10 @@ typedef struct gc
 }
 gc;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Allocates a new gc_obj on the heap and initializes its fields.
  *
@@ -140,5 +144,9 @@ void cgc_gc_collect (gc * garcol);
  * garcol - garbage collector
 */
 void cgc_gc_destroy (gc * garcol);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // !CGC_GC_H
