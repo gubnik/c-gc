@@ -29,6 +29,7 @@ typedef void* (*allocator_t)(size_t);
  * the object via garbage collector.
  * Acts as a linked list.
  *
+ * @mutex   - pthread mutex
  * @next    - next object
  * @memarea - allocated memory
  * @marked  - is object marked for deletion
@@ -48,7 +49,8 @@ gc_obj;
  *
  * Wrapper struct that implements a garbage collector 
  *
- * root - root of a linked list consisting of garbage collector objects
+ * @mutex - pthread mutex
+ * @root  - root of a linked list consisting of garbage collector objects
  *
 */
 typedef struct gc 
@@ -82,8 +84,9 @@ gc * cgc_init_gc ();
  * When this function is called, allocated memory is known to GC.
  *
  * Params:
- * garcol - garbage collector 
+ * garcol    - garbage collector 
  * allocsize - amount of memory to allocate 
+ * allocator - allocator function
 */
 void * cgc_gc_allocate (gc * garcol, size_t allocsize, allocator_t allocator);
 
