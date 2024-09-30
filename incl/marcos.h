@@ -17,6 +17,7 @@
 
 #include "gc.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 int CGCUserMain(int argc, char ** argv, gc * gc);
 
@@ -69,6 +70,35 @@ void * cgc_init_##Type (size_t N) \
 #else 
 #define allocate(gc, Type) (Type *) cgc_gc_allocate(gc, sizeof(Type), objalloc(Type))
 #define allocate_area(gc, Type, N) (Type *) cgc_gc_allocate(gc, sizeof(Type) * (size_t) N, objalloc(Type))
+#endif
+
+/*
+ * Macro for implementing pseudo-constructors
+ * Make sure that thee construsctor you call is defined in cgc_construct_$(typename) function 
+ * with matching argument types
+ */
+#ifdef CGC_USE_INIT
+#ifdef CGC_USE_CONSTRUCTORS
+#ifdef CGC_ENTRY_POINT
+#define construct(objname, Type, ...) \
+  Type * objname = allocate(Type); \
+  if (!objname) \
+  { \
+    fprintf(stderr, "[Error] Constructor failed because allocator %s failed\n", "##objalloc(Type)"); \
+    exit (1); \
+  } \
+  cgc_construct_##Type(objname, __VA_ARGS__);
+#else 
+#define construct(objname, gc, Type, ...) \
+  Type * objname = allocate(gc, Type); \
+  if (!objname) \
+  { \
+    fprintf(stderr, "[Error] Constructor failed because allocator %s failed\n", "##objalloc(Type)"); \
+    exit (1); \
+  } \
+  cgc_construct_##Type(objname, __VA_ARGS__);
+#endif
+#endif
 #endif
 
 #endif // !CGC_MACROS_H

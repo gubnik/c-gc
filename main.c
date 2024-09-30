@@ -4,6 +4,7 @@
 
 #define CGC_USE_INIT
 #define CGC_ENTRY_POINT
+#define CGC_USE_CONSTRUCTORS
 
 #include "incl/marcos.h"
 
@@ -12,6 +13,25 @@ void * cgc_init_int (size_t N)
   int * I = malloc(N);
   *I = 42;
   return I;
+}
+
+typedef struct big_stuff
+{
+  size_t M;
+  size_t N;
+} big_stuff;
+
+void * cgc_init_big_stuff (size_t N)
+{
+  big_stuff * obj = malloc(N);
+  return obj;
+}
+
+void cgc_construct_big_stuff (void * objptr, size_t A, size_t B)
+{
+  big_stuff * bs = (big_stuff *) objptr;
+  bs->M = A;
+  bs->N = B;
 }
 
 #define TALLOCS 5
@@ -42,5 +62,9 @@ int main (int argc, char ** argv)
     printf("%p :: %d\n", iter, *(int*)iter->memarea);
     iter = iter->next;
   }
+  printf("Multithreading tests finished!\n");
+  // Constructor test
+  construct(BS, big_stuff, 42, 69);
+  printf("BS constructed: %lu %lu\n", BS->M, BS->N);
   return 0;
 }
