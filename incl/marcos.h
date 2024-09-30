@@ -48,17 +48,17 @@ int CGCUserMain(int argc, char ** argv, gc * gc);
  * the initalized garbage collector by $garcol.
  */
 #ifdef CGC_ENTRY_POINT
-#define main(...) \
-  main (int argc, char ** argv) \
-  { \
-    gc * garcol = cgc_init_gc(); \
-    int res = \
-      CGCUserMain(argc, argv, garcol); \
-    cgc_gc_collect (garcol); \
-    cgc_gc_destroy (garcol); \
-    return res; \
-  } \
-  int CGCUserMain(int argc, char ** argv, gc * garcol)
+  #define main(...) \
+    main (int argc, char ** argv) \
+    { \
+      gc * garcol = cgc_init_gc(); \
+      int res = \
+        CGCUserMain(argc, argv, garcol); \
+      cgc_gc_collect (garcol); \
+      cgc_gc_destroy (garcol); \
+      return res; \
+    } \
+    int CGCUserMain(int argc, char ** argv, gc * garcol)
 #endif
 
 /*
@@ -84,11 +84,11 @@ void * cgc_init_##Type (size_t N) \
  * With custom entry point, it is not required to pass garbage collector pointer.
  */
 #ifdef CGC_ENTRY_POINT
-#define allocate(Type) (Type *) cgc_gc_allocate(garcol, sizeof(Type), objalloc(Type))
-#define allocate_area(Type, N) (Type *) cgc_gc_allocate(garcol, sizeof(Type) * (size_t) N, objalloc(Type))
+  #define allocate(Type) (Type *) cgc_gc_allocate(garcol, sizeof(Type), objalloc(Type))
+  #define allocate_area(Type, N) (Type *) cgc_gc_allocate(garcol, sizeof(Type) * (size_t) N, objalloc(Type))
 #else 
-#define allocate(gc, Type) (Type *) cgc_gc_allocate(gc, sizeof(Type), objalloc(Type))
-#define allocate_area(gc, Type, N) (Type *) cgc_gc_allocate(gc, sizeof(Type) * (size_t) N, objalloc(Type))
+  #define allocate(gc, Type) (Type *) cgc_gc_allocate(gc, sizeof(Type), objalloc(Type))
+  #define allocate_area(gc, Type, N) (Type *) cgc_gc_allocate(gc, sizeof(Type) * (size_t) N, objalloc(Type))
 #endif
 
 /*
@@ -97,27 +97,34 @@ void * cgc_init_##Type (size_t N) \
  * with matching argument types
  */
 #ifdef CGC_USE_INIT
-#ifdef CGC_USE_CONSTRUCTORS
-#ifdef CGC_ENTRY_POINT
-#define construct(objname, Type, ...) \
-  Type * objname = allocate(Type); \
-  if (!objname) \
-  { \
-    fprintf(stderr, "[Error] Constructor failed because allocator had failed\n"); \
-    exit (1); \
-  } \
-  cgc_construct_##Type(objname, __VA_ARGS__);
-#else 
-#define construct(objname, gc, Type, ...) \
-  Type * objname = allocate(gc, Type); \
-  if (!objname) \
-  { \
-    fprintf(stderr, "[Error] Constructor failed because allocator had failed\n"); \
-    exit (1); \
-  } \
-  cgc_construct_##Type(objname, __VA_ARGS__);
+  #ifdef CGC_USE_CONSTRUCTORS
+    #ifdef CGC_ENTRY_POINT
+      #define construct(objname, Type, ...) \
+        Type * objname = allocate(Type); \
+        if (!objname) \
+        { \
+          fprintf(stderr, "[Error] Constructor failed because allocator had failed\n"); \
+          exit (1); \
+        } \
+        cgc_construct_##Type(objname, __VA_ARGS__);
+    #else 
+      #define construct(objname, gc, Type, ...) \
+        Type * objname = allocate(gc, Type); \
+        if (!objname) \
+        { \
+          fprintf(stderr, "[Error] Constructor failed because allocator had failed\n"); \
+          exit (1); \
+        } \
+        cgc_construct_##Type(objname, __VA_ARGS__);
+    #endif
+  #endif
 #endif
-#endif
-#endif
+
+#define CGC_MAKE_DEFAULT_CONSTRUCTORS(Type) \
+void cgc_construct_##Type(void * obj, size_t s1, size_t s2) \
+{ \
+  size_t size = sizeof(Type); \
+  for (size_t i = 0; i < size / sizeof(size_t); i++) ((size_t*)obj)[i] &= 0; \
+}
 
 #endif // !CGC_MACROS_H
