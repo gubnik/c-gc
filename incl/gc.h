@@ -1,6 +1,7 @@
 #ifndef C_GC
 #define C_GC
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -23,6 +24,7 @@ typedef void* (*allocator_t)(size_t);
 */
 typedef struct gc_obj
 {
+  pthread_mutex_t mutex;
   gc_obj *  next;
   void * memarea;
   bool marked;
@@ -39,6 +41,7 @@ gc_obj;
 */
 typedef struct gc 
 {
+  pthread_mutex_t mutex;
   gc_obj * root;
 }
 gc;

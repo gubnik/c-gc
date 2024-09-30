@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-O2 -Wall -fsanitize=address
-CLIBFLAGS=-O2 -Wall
-LDFLAGS=gc.o
-LDLIBFLAGS=
+CFLAGS=-O2 -Wall -fsanitize=address -pthread
+CLIBFLAGS=-O2 -Wall -pthread
+LDFLAGS=gc.o -pthread
+LDLIBFLAGS=-pthread
 
 .PHONY: main %.o
 
