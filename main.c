@@ -34,6 +34,8 @@ void cgc_construct_big_stuff (void * objptr, size_t A, size_t B)
   bs->N = B;
 }
 
+//CGC_MAKE_DEFAULT_CONSTRUCTORS(big_stuff)
+
 #define TALLOCS 5
 
 void * threadfunc (void * garcol)
