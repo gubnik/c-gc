@@ -176,7 +176,6 @@ void cgc_gc_destroy(gc *garcol)
   while (iter)
   {
     gc_obj * temp = iter->next;
-    pthread_mutex_unlock(&iter->mutex);
     pthread_mutex_destroy(&iter->mutex);
     free(iter->memarea);
     free(iter);
